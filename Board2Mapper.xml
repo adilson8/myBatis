@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 여러개의 Mapper XML 파일이 존재할 때, 
+    각 Mapper XML 파일의 최상위 태그의 namespace 속성 값은 고유해야함 (충돌이 없어야함)
+    관례상 파일명과 동일하게 설정해준다. -->
+<mapper namespace="mappers.Board2Mapper">
+
+    <!-- 동적 SQL 문장 저장 -->
+    <select 
+        id="findBoardsByBno"
+        resultType="org.zerock.myapp.domain.BoardVO">
+        
+        SELECT *
+        FROM tbl_board
+     
+        <!-- 검색조건1: 특정 BNO에 해당하는 게시글 하나 조회 -->
+        <if test="bno != null">
+            WHERE bno = #{bno}
+        </if>    
+    </select>
+
+    <select 
+        id="findBoardsByTitle"
+        resultType="org.zerock.myapp.domain.BoardVO">
+        SELECT *
+        FROM tbl_board
+
+        <!-- 검색조건2 :  특정 검색어를 포함하고 있는 제목을 가지는 모든 게시글 조회 -->
+        <where>
+            <if test="title != null">
+                title LIKE '%'||#{title}||'%'
+            </if>
+        </where>
+    </select>
+
+    <select 
+        id="findBoardsByWriter"
+        resultType="org.zerock.myapp.domain.BoardVO">
+        SELECT *
+        FROM tbl_board
+
+        <trim prefix="WHERE">
+            <if test="writer != null">
+                writer LIKE '%'||#{writer}||'%'
+            </if>
+        </trim>
+    </select>
+
+    <select 
+        id="findBoardsByBnoAndTitle"
+        resultType="org.zerock.myapp.domain.BoardVO">
+        SELECT *
+        FROM tbl_board
+        <trim prefix="WHERE" prefixOverrides="AND | OR">
+            <if test="bno != null">
+                bno > #{bno}
+            </if>
+
+            <if test="title != null">
+                title LIKE '%'||#{title}||'%'
+            </if>
+        </trim>
+    </select>
+
+</mapper>
